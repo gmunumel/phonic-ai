@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "path": "ai"
+    },
+    {
+      "path": "backend"
+    },
+    {
+      "path": "frontend"
+    },
+    {
+      "path": "."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[project]
+name = "phonic-ai"
+version = "0.1.0"
+description = "AI integration module for Whisper-based transcription"
+authors = [
+    { name="Gabriel Munumel", email="gabrielmunumel@gmail.com" }
+]
+dependencies = [
+    "whisper==1.1.10",
+    "numpy==1.26.4",
+    "torch==2.3.0"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

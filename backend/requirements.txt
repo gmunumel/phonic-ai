@@ -1,0 +1,8 @@
+fastapi==0.110.2
+uvicorn[standard]==0.29.0
+websockets==12.0
+pydantic==2.7.1
+python-multipart==0.0.9
+whisper==1.1.10
+numpy==1.26.4
+torch==2.3.0
