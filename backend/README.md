@@ -1,3 +1,5 @@
+# Backend
+
 This directory contains the backend implementation of the Live Video/Audio Transcript application using FastAPI and WebSockets.
 
 ## Project Structure
@@ -14,37 +16,48 @@ This directory contains the backend implementation of the Live Video/Audio Trans
 ## Setup Instructions
 
 1. **Install Local Virtual Environment**:
+
    ```
    uv venv --python 3.12.0
    ```
 
-Then activate:
+   Then activate:
 
-    ```
-    source .venv/bin/activate
-    ```
+   ```
+   source .venv/bin/activate
+   ```
 
 2. **Install Dependencies**:
    Navigate to the backend directory and install the required packages using:
 
    ```
-   pip install -r requirements.txt
+   uv pip install .
    ```
 
 3. **Run the Application**:
    Start the FastAPI application using:
 
    ```
-   uvicorn app.main:app --reload
+   export $(cat .env | xargs) && uvicorn src.app:app --reload
    ```
+
+   The `export` command is to set up a `PYTHONPATH` based on value in `.env` file.
 
 4. **Access the API**:
    The API will be available at `http://localhost:8000`. You can access the WebSocket endpoint at `ws://localhost:8000/ws`.
 
+## Environment Variables
+
+Create a `.env` file in the `backend` directory with the following variables:
+
+| Variable   | Description                                  | Example Value               |
+| ---------- | -------------------------------------------- | --------------------------- |
+| PYTHONPATH | Path to the external `ai` package directory. | `/home/<user>/phonic-ai/ai` |
+
 ## Usage Details
 
 - The backend handles real-time audio/video streaming and transcription using WebSockets.
-- It integrates with the Whisper AI service for speech-to-text processing.
+- It integrates with the Whisper AI service for speech-to-text processing, located in [AI](../ai/) folder.
 
 ## Additional Notes
 

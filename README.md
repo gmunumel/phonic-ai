@@ -6,7 +6,7 @@ Live Video/Audio Transcript application that combines real-time audio/video stre
 
 - **backend/**: Contains the FastAPI backend implementation.
 
-  - **app/**: Main application code.
+  - **src/**: Main application code.
     - **main.py**: Entry point for the FastAPI application.
     - **api/**: WebSocket routes for real-time communication.
     - **services/**: Integration logic for Whisper AI service.
@@ -31,6 +31,7 @@ Live Video/Audio Transcript application that combines real-time audio/video stre
   - **README.md**: Documentation for the frontend.
 
 - **ai/**: Contains the integration logic for the Whisper AI service.
+
   - **whisper_integration.py**: Functions to interact with the Whisper API.
   - **README.md**: Documentation for the AI integration.
 
@@ -64,3 +65,34 @@ Live Video/Audio Transcript application that combines real-time audio/video stre
 ## Remarks
 
 This project leverages modern web technologies to provide a seamless experience for live transcription using AI.
+
+## Sequence Diagram
+
+The following sequence diagram illustrates the flow of audio transcription in the application:
+
+1. User Interaction:
+   The process begins when the User initiates a recording session in the frontend application.
+
+2. **Frontend to Backend:**
+   The Frontend captures the audio stream and sends it to the Backend using a WebSocket connection, transmitting audio chunks in real time.
+
+3. **Backend to Whisper Service:**
+   The Backend receives the audio data and forwards it to the WhisperService for transcription by calling the `transcribe(audio_data)` method.
+
+4. **Whisper Service to AI Integration:**
+   The WhisperService interacts with the WhisperIntegration (AI) component, requesting transcription with timestamps by invoking `get_transcription_with_timestamps(temp_audio)`.
+
+5. **AI Integration Response:**
+   The WhisperIntegration (AI) processes the audio and returns the transcription segments, including text and timestamp information, back to the WhisperService.
+
+6. **Transcription Propagation:**
+   The WhisperService sends the transcription segments to the Backend, which then emits a WebSocket "transcription" event (or an HTTP response) to the Frontend.
+
+7. **Frontend Display:**
+   Finally, the Frontend displays the live transcript, including timestamps, to the User.
+
+![Sequence Diagram](docs/sequence_diagram/Sequence%20Diagram.png)
+
+## License
+
+[MIT License](https://opensource.org/license/mit)

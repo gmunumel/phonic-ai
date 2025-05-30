@@ -1,5 +1,5 @@
 [project]
-name = "phonic-ai"
+name = "ai"
 version = "0.1.0"
 description = "AI integration module for Whisper-based transcription"
 authors = [
@@ -8,9 +8,14 @@ authors = [
 dependencies = [
     "whisper==1.1.10",
     "numpy==1.26.4",
-    "torch==2.3.0"
+    "torch==2.3.0",
+    "requests==2.31.0",
+    "python-dotenv==1.0.1"
 ]
 
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["ai"]

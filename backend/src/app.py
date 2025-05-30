@@ -1,13 +1,16 @@
-from fastapi import FastAPI
+# pylint: disable=import-error
+from fastapi import FastAPI, UploadFile, File, Depends
 from fastapi.middleware.cors import CORSMiddleware
+
 from src.api.websocket import websocket_router
+from src.services.whisper_service import WhisperService
 
 app = FastAPI()
 
 # Middleware to allow CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this as needed for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -17,6 +20,19 @@ app.add_middleware(
 app.include_router(websocket_router)
 
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to the Live Video/Audio Transcript API!"}
+# TODO : remove this endpoint or comment it out
+# This is a temporary endpoint for testing purposes
+def get_whisper_service():
+    return WhisperService()
+
+
+# TODO : remove this endpoint or comment it out
+# This is a temporary endpoint for testing purposes
+@app.post("/transcribe")
+async def transcribe(
+    file: UploadFile = File(...),
+    whisper_service: WhisperService = Depends(get_whisper_service),
+):
+    audio_data = await file.read()
+    result = whisper_service.transcribe(audio_data)
+    return {"transcripts": result}

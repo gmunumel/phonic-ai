@@ -1,0 +1,71 @@
+.flexRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.headerContainer {
+  background: #d8dee7;
+  border-radius: 12px;
+  padding: 0.5rem 2.5rem 1.5rem 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #e74c3c;
+  margin: 0.2rem 0;
+  font-weight: 500;
+}
+
+.demoNote {
+  font-size: 1.1rem;
+  color: #3498db;
+  margin: 0.2rem 0 0.7rem 0;
+  font-weight: 500;
+}
+
+.instructions {
+  font-size: 1rem;
+  color: #444;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.techList {
+  font-size: 1.05rem;
+  color: #2d3748;
+  margin-top: 1.2rem;
+  margin-bottom: 0;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: #f3f6fa;
+  padding: 0.7em 1.2em;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+  line-height: 2;
+}
+
+.techList a {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.techList a:hover {
+  color: #3498db;
+  text-decoration: underline;
+}

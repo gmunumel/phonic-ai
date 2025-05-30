@@ -1,5 +1,5 @@
 [project]
-name = "phonic-backend"
+name = "backend"
 version = "0.1.0"
 description = "FastAPI backend for live video/audio transcription with Whisper AI integration"
 authors = [

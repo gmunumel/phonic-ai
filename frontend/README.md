@@ -1,4 +1,4 @@
-# phonic-api Frontend
+# Frontend
 
 This directory contains the frontend application for the Live Video/Audio Transcript project, built using React and RecordRTC.
 
@@ -27,8 +27,10 @@ The frontend project is structured as follows:
 - `public/index.html`: The main HTML file that serves as the entry point for the React application.
 - `src/App.tsx`: The main component that sets up routing and layout for the application.
 - `src/index.tsx`: The entry point for the React application that renders the App component.
+- `src/components/Manager.tsx`: A centralized component to handle components: `Recorder`, `Transcript` and `SequenceDiagram`.
 - `src/components/Recorder.tsx`: A component that captures audio/video input using RecordRTC.
 - `src/components/Transcript.tsx`: A component that displays the live transcription of audio input.
+- `src/components/SequenceDiagram.tsx`: A component to display and manipulate the sequence diagram made with _mermaid_.
 - `src/services/websocket.ts`: Contains logic for managing WebSocket connections to the backend.
 
 ## Key Features

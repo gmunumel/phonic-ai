@@ -1,4 +1,4 @@
-# AI Integration for Live Video/Audio Transcript Application
+# AI Integration
 
 This directory contains the integration logic for the Whisper AI service, which is used for speech-to-text processing in the Live Video/Audio Transcript application.
 
@@ -6,15 +6,13 @@ This directory contains the integration logic for the Whisper AI service, which 
 
 - **whisper_integration.py**: This file contains the functions to interact with the Whisper API for converting audio input into text.
 
-## Setup Instructions
 
-1. Ensure you have the necessary dependencies installed. Refer to the `requirements.txt` in the backend directory for any additional libraries that may be required.
-2. Configure the Whisper API credentials if necessary.
 
 ## Usage
 
 - Import the functions from `whisper_integration.py` to utilize the speech-to-text capabilities in your application.
-- Follow the examples provided in the code to integrate with the FastAPI backend and the React frontend.
+- This library is means to work as a imported library and not as standalone. 
+- Library must be imported by _backend_. Please read backend [README](../backend/README.md) file.
 
 ### Install Local Virtual Environment
 
@@ -23,6 +21,10 @@ This directory contains the integration logic for the Whisper AI service, which 
 Then activate:
 
     source .venv/bin/activate
+
+### Run Application
+
+    python ai/whisper_integration.py
 
 ## Key Features
 

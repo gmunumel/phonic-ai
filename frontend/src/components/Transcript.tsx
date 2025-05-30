@@ -1,18 +1,19 @@
 import React from "react";
+import styles from "components/Transcript.module.css";
 
 const Transcript: React.FC<{
-  transcripts: Array<{ text: string; timestamp: number }>;
+  transcripts: Array<{ text: string; start: number; end: number }>;
 }> = ({ transcripts }) => {
   return (
-    <div>
+    <div className={styles.transcriptContainer}>
       <h2>Live Transcription</h2>
       <ul>
-        {transcripts.map((transcript, index) => (
+        {transcripts.map((segment, index) => (
           <li key={index}>
             <strong>
-              {new Date(transcript.timestamp).toLocaleTimeString()}:
+              [{segment.start.toFixed(2)}s - {segment.end.toFixed(2)}s]:
             </strong>{" "}
-            {transcript.text}
+            {segment.text}
           </li>
         ))}
       </ul>
