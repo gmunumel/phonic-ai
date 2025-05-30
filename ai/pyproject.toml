@@ -6,9 +6,6 @@ authors = [
     { name="Gabriel Munumel", email="gabrielmunumel@gmail.com" }
 ]
 dependencies = [
-    "whisper==1.1.10",
-    "numpy==1.26.4",
-    "torch==2.3.0",
     "requests==2.31.0",
     "python-dotenv==1.0.1"
 ]

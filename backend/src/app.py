@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.websocket import websocket_router
 from src.services.whisper_service import WhisperService
 
+
 app = FastAPI()
 
 # Middleware to allow CORS

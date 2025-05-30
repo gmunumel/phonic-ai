@@ -6,6 +6,10 @@ let transcriptionCallback:
   | ((segments: Array<{ text: string; start: number; end: number }>) => void)
   | null = null;
 
+const WAIT_TIME_BEFORE_RECONNECT_MS = Number(
+  process.env.WAIT_TIME_BEFORE_RECONNECT_MS || 30000 // 30 seconds
+);
+
 export const connectWebSocket = () => {
   const wsUrl =
     process.env.REACT_APP_BACKEND_URL?.replace(/^http/, "ws") +
@@ -17,8 +21,16 @@ export const connectWebSocket = () => {
     console.log("Connected to WebSocket server");
   };
 
-  socket.onclose = () => {
-    console.log("Disconnected from WebSocket server");
+  socket.onclose = (event) => {
+    // Check for your custom close code
+    if (event.code === 4000) {
+      // Wait before reconnecting
+      setTimeout(() => {
+        connectWebSocket(); // or your reconnect logic
+      }, WAIT_TIME_BEFORE_RECONNECT_MS);
+    } else {
+      // Handle other close reasons
+    }
   };
 
   socket.onerror = (err) => {
@@ -26,6 +38,16 @@ export const connectWebSocket = () => {
   };
 
   socket.onmessage = (event) => {
+    if (
+      typeof event.data === "string" &&
+      event.data.includes("Rate limit exceeded")
+    ) {
+      window.dispatchEvent(
+        new CustomEvent("rate-limit-error", { detail: event.data })
+      );
+      return;
+    }
+
     try {
       const data = JSON.parse(event.data);
       if (data.service && xIdCallback) {

@@ -25,6 +25,7 @@ backend/.vscode
 backend/**/*/*.egg-info
 backend/*.egg-info
 backend/.python-version 
+backend/build/*
 
 #frontend
 frontend/node_modules

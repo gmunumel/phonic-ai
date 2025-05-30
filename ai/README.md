@@ -1,6 +1,6 @@
 # AI Integration
 
-This directory contains the integration logic for the Whisper AI service, which is used for speech-to-text processing in the Live Video/Audio Transcript application.
+This directory contains the integration logic for the Whisper AI service, which is used for speech-to-text processing in the Live Audio Transcript application.
 
 ## Files
 

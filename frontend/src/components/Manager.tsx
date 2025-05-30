@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { stopRecord } from "store/recorderSlice";
 import Recorder from "components/Recorder";
 import Transcript from "components/Transcript";
 import SequenceDiagram from "components/SequenceDiagram";
@@ -11,11 +12,15 @@ import {
 import styles from "components/Manager.module.css";
 
 type Segment = { text: string; start: number; end: number };
+const WAIT_TIME_TO_RESET_DIAGRAM_MS = Number(
+  process.env.WAIT_TIME_TO_RESET_DIAGRAM_MS || 4000 // 4 seconds
+);
 
 const App: React.FC = () => {
   const isRecording = useSelector((state: any) => state.recorder.isRecording);
   const isMounted = useRef(false);
   const [transcripts, setTranscripts] = useState<Segment[]>([]);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [diagram, setDiagram] = useState(`
 sequenceDiagram
     actor User
@@ -30,11 +35,12 @@ sequenceDiagram
     WhisperService->>WhisperIntegration (AI): get_transcription_with_timestamps(temp_audio)
     WhisperIntegration (AI)-->>WhisperService: [segments: text, start, end]
     WhisperService-->>Backend: [segments: text, start, end]
-    Backend-->>Frontend: transcription event or HTTP response
+    Backend-->>Frontend: WebSocket "transcription" event
     Frontend-->>User: Display live transcript
 
 %%{init:{'themeCSS':'g.actor-man line, g.actor-man circle, g:nth-of-type(10) line.actor-line { stroke: #66ff33; fill: #66ff33; }'}}%%
 `);
+  const dispatch = useDispatch();
 
   const removeLastLine = (text: string) => {
     const lines = text.trimEnd().split("\n");
@@ -84,19 +90,27 @@ sequenceDiagram
     setDiagram(newDiagram);
   };
 
-  const buildInitialSequenceDiagram = (isStarted: boolean) => {
+  const getBaseDiagram = () => {
     let newDiagram = diagram;
-
     newDiagram = newDiagram.replace(/\[[^\]:\s]+?\]/g, "");
     newDiagram = removeLastLine(newDiagram);
+    return newDiagram;
+  };
 
-    if (isStarted) {
-      newDiagram +=
-        "%%{init:{'themeCSS':'g:nth-of-type(9) line.actor-line, g:nth-of-type(9) g rect { stroke: #66ff33; fill: #66ff33; }, g:nth-of-type(4) rect.actor-bottom { stroke: #66ff33; fill: #66ff33; }'}}%%";
-    } else {
-      newDiagram +=
-        "%%{init:{'themeCSS':'g.actor-man line, g.actor-man circle, g:nth-of-type(10) line.actor-line { stroke: #66ff33; fill: #66ff33; }'}}%%";
-    }
+  const buildSequenceDiagramInitial = () => {
+    let newDiagram = getBaseDiagram();
+
+    newDiagram +=
+      "%%{init:{'themeCSS':'g.actor-man line, g.actor-man circle, g:nth-of-type(10) line.actor-line { stroke: #66ff33; fill: #66ff33; }'}}%%";
+
+    setDiagram(newDiagram);
+  };
+
+  const buildSequenceDiagramFirstStep = () => {
+    let newDiagram = getBaseDiagram();
+
+    newDiagram +=
+      "%%{init:{'themeCSS':'g:nth-of-type(9) line.actor-line, g:nth-of-type(9) g rect { stroke: #66ff33; fill: #66ff33; }, g:nth-of-type(4) rect.actor-bottom { stroke: #66ff33; fill: #66ff33; }'}}%%";
 
     setDiagram(newDiagram);
   };
@@ -106,8 +120,8 @@ sequenceDiagram
     onXIdReceived((xId: string, service: string, details: string) => {
       if (service === "Stop") {
         setTimeout(() => {
-          buildInitialSequenceDiagram(false);
-        }, 4000);
+          buildSequenceDiagramInitial();
+        }, WAIT_TIME_TO_RESET_DIAGRAM_MS);
       } else {
         buildSequenceDiagram(service, details, xId);
       }
@@ -125,7 +139,8 @@ sequenceDiagram
   useEffect(() => {
     if (!isMounted.current) return;
     if (isRecording) {
-      buildInitialSequenceDiagram(true);
+      setRateLimitError(null);
+      buildSequenceDiagramFirstStep();
     }
   }, [isRecording]);
 
@@ -135,10 +150,23 @@ sequenceDiagram
     }
   }, []);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      setRateLimitError(customEvent.detail);
+      dispatch(stopRecord());
+      setTimeout(() => {
+        buildSequenceDiagramInitial();
+      }, WAIT_TIME_TO_RESET_DIAGRAM_MS);
+    };
+    window.addEventListener("rate-limit-error", handler);
+    return () => window.removeEventListener("rate-limit-error", handler);
+  }, []);
+
   return (
     <>
       <div className={styles.headerContainer}>
-        <h1 className={styles.title}>Live Video/Audio Transcript</h1>
+        <h2 className={styles.title}>Live Audio Transcript</h2>
         <h3 className={styles.subtitle}>
           Audio files are not shared or stored in any way.
         </h3>
@@ -147,13 +175,18 @@ sequenceDiagram
         </h3>
         <p className={styles.instructions}>
           <b>Code can be viewed in: </b>
-          <a href="#" className={styles.codeLink}>
-            github.com/your-repo
+          <a
+            href="https://github.com/gmunumel/phonic-ai"
+            className={styles.codeLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            https://github.com/gmunumel/phonic-ai
           </a>
         </p>
         <p className={styles.instructions}>
           <b>How to use it:</b> Click on the REC button and start speaking to
-          the mic. Transcription should appear automatically.
+          the mic. Transcriptions should appear automatically.
         </p>
         <p className={styles.techList}>
           Technologies used:{" "}
@@ -186,6 +219,9 @@ sequenceDiagram
         </p>
       </div>
       <Recorder />
+      {rateLimitError && (
+        <div className={styles.errorBanner}>{rateLimitError}</div>
+      )}
       <div className={styles.flexRow}>
         <Transcript transcripts={transcripts} />
         <SequenceDiagram diagram={diagram} id={sequenceDiagramId} />

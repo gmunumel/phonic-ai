@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7
+    container_name: phonic-ai-redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: phonic-ai-backend
+    environment:
+      - REDIS_URL=redis://phonic-ai-redis:6379
+      - PYTHONPATH=/phonic-ai/ai
+      - MAX_RECORDINGS_PER_MINUTE=10
+      - MAX_RECORDINGS_PER_HOUR=60
+      - MAX_RECORDINGS_PER_DAY=200
+    volumes:
+      - ./backend:/phonic-ai/backend
+      - ./ai:/phonic-ai/ai
+    depends_on:
+      - redis
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: phonic-ai-frontend
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+      - WAIT_TIME_BEFORE_RECONNECT_MS=30000
+      - WAIT_TIME_TO_RESET_DIAGRAM_MS=4000
+      - WAIT_TIME_BETWEEN_CHUNK_AUDIO_MS=4000
+    volumes:
+      - ./frontend:/phonic-ai/frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "npm install && npm start"

@@ -1,6 +1,6 @@
 # phonic-api
 
-Live Video/Audio Transcript application that combines real-time audio/video streaming with AI-powered transcription.
+Live Audio Transcript application that combines real-time audio streaming with AI-powered transcription.
 
 ## Project Structure
 
@@ -22,7 +22,7 @@ Live Video/Audio Transcript application that combines real-time audio/video stre
     - **App.tsx**: Main component of the React application.
     - **index.tsx**: Entry point for the React application.
     - **components/**: Reusable components for the application.
-      - **Recorder.tsx**: Component for capturing audio/video input.
+      - **Recorder.tsx**: Component for capturing audio input.
       - **Transcript.tsx**: Component for displaying live transcription.
     - **services/**: Logic for managing WebSocket connections.
       - **websocket.ts**: Functions to connect and communicate with the backend.
@@ -60,6 +60,44 @@ Live Video/Audio Transcript application that combines real-time audio/video stre
 5. Start the frontend application:
    ```
    npm start
+   ```
+
+## Running with Docker Compose
+
+You can run the entire application stack (frontend, backend, ai and Redis) using Docker Compose.
+This ensures all services are started and networked correctly for real-time WebSocket communication and AI integration.
+
+### Steps
+
+1. **Build and Start All Services**
+   From the root directory (phonic-ai/), run:
+
+   ```
+   docker-compose up --build
+   ```
+
+   - Build the frontend and backend images.
+   - Start the backend (FastAPI + Redis), frontend (React), and Redis services.
+   - Expose the frontend on http://localhost:3000 and backend API on http://localhost:8000.
+
+2. **Access the Application**
+
+   - Open your browser and go to http://localhost:3000 to use the app.
+   - The frontend will communicate with the backend via WebSockets and the backend will use Redis for rate limiting and session management.
+
+3. **Stopping the Services**
+   To stop all running containers, press Ctrl+C in the terminal where Docker Compose is running, then run:
+
+   ```
+   docker-compose down
+   ```
+
+4. **Access containers**
+
+   ```
+   docker exec -it phonic-ai-frontend bash
+   docker exec -it phonic-ai-backend bash
+   docker exec -it phonic-ai-redis redis-cli
    ```
 
 ## Remarks

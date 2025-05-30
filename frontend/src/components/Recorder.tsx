@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { startRecord, stopRecord } from "store/recorderSlice";
 import { RecordRTCPromisesHandler } from "recordrtc";
 import { sendXId, sendAudioChunk, sendMessage } from "services/websockets";
 import styles from "components/Recorder.module.css";
 
+const WAIT_TIME_BETWEEN_CHUNK_AUDIO_MS = Number(
+  process.env.WAIT_TIME_BETWEEN_CHUNK_AUDIO_MS || 4000 // 4 seconds
+);
+
 const Recorder: React.FC = () => {
+  const isPlaying = useSelector((state: any) => state.recorder.isRecording);
   const [isRecording, setIsRecording] = useState(false);
   const recorderRef = useRef<RecordRTCPromisesHandler | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -23,6 +28,7 @@ const Recorder: React.FC = () => {
     setIsRecording(true);
 
     intervalRef.current = setInterval(async () => {
+      console.log(`[setInterval] isPlaying: ${isPlaying}`);
       if (recorderRef.current) {
         await recorderRef.current.stopRecording();
         const blob = await recorderRef.current.getBlob();
@@ -31,7 +37,7 @@ const Recorder: React.FC = () => {
         xIdRef.current = Math.random().toString(36).substring(2, 15);
         await recorderRef.current.startRecording();
       }
-    }, 4000); // Send audio chunks every 4 seconds
+    }, WAIT_TIME_BETWEEN_CHUNK_AUDIO_MS);
   };
 
   const stopRecording = async () => {
@@ -59,6 +65,13 @@ const Recorder: React.FC = () => {
       if (recorderRef.current) recorderRef.current.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    console.log(`[useEffect] isPlaying: ${isPlaying}`);
+    if (!isPlaying) {
+      stopRecording();
+    }
+  }, [isPlaying]);
 
   return (
     <div className={styles.recorderRow}>

@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "type": "module",
-  "description": "Frontend for Live Video/Audio Transcript application using React and RecordRTC.",
+  "description": "Frontend for Live Audio Transcript application using React and RecordRTC.",
   "main": "src/index.tsx",
   "scripts": {
     "start": "NODE_OPTIONS=--openssl-legacy-provider react-scripts start",

@@ -1,13 +1,13 @@
 # Backend
 
-This directory contains the backend implementation of the Live Video/Audio Transcript application using FastAPI and WebSockets.
+This directory contains the backend implementation of the Live Audio Transcript application using FastAPI and WebSockets.
 
 ## Project Structure
 
 - **app/**: Contains the main application code.
   - **main.py**: Entry point for the FastAPI application. Initializes the app and sets up middleware.
   - **api/**: Contains the WebSocket routes.
-    - **websocket.py**: Handles WebSocket connections and manages real-time audio/video streaming.
+    - **websocket.py**: Handles WebSocket connections and manages real-time audio streaming.
   - **services/**: Contains service logic.
     - **whisper_service.py**: Integration logic for the Whisper AI service.
   - **models/**: Contains data models.
@@ -48,18 +48,22 @@ This directory contains the backend implementation of the Live Video/Audio Trans
 
 ## Environment Variables
 
-Create a `.env` file in the `backend` directory with the following variables:
+Create a `.env` file in the `backend` directory with the following variables (adjust if necessary):
 
-| Variable   | Description                                  | Example Value               |
-| ---------- | -------------------------------------------- | --------------------------- |
-| PYTHONPATH | Path to the external `ai` package directory. | `/home/<user>/phonic-ai/ai` |
+| Variable                    | Description                                  | Example Value               |
+| --------------------------- | -------------------------------------------- | --------------------------- |
+| `PYTHONPATH`                | Path to the external `ai` package directory. | `/home/<user>/phonic-ai/ai` |
+| `REDIS_URL`                 | Redis server url.                            | `redis://localhost:6379`    |
+| `MAX_RECORDINGS_PER_MINUTE` | Maximum recordings per minute.               | 10                          |
+| `MAX_RECORDINGS_PER_HOUR`   | Maximum recordings per hour.                 | 60                          |
+| `MAX_RECORDINGS_PER_DAY`    | Maximum recordings per day.                  | 200                         |
 
 ## Usage Details
 
-- The backend handles real-time audio/video streaming and transcription using WebSockets.
+- The backend handles real-time audio streaming and transcription using WebSockets.
 - It integrates with the Whisper AI service for speech-to-text processing, located in [AI](../ai/) folder.
 
 ## Additional Notes
 
-- Ensure that you have the necessary permissions and configurations for audio/video capture in your environment.
+- Ensure that you have the necessary permissions and configurations for audio capture in your environment.
 - Refer to the individual service and model files for more detailed implementation information.

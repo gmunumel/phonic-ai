@@ -4,11 +4,22 @@ import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 
 from src.services.whisper_service import WhisperService
-
+from src.services.redis_service import increment_and_check_limits
+from src.log import logger
 
 websocket_router = APIRouter()
 
 ACTIVE_CONNECTIONS: list[WebSocket] = []
+
+# counter = 0
+# reset_task = None  # Add this at the module level
+
+
+# async def reset_counter_after_delay(delay: float = 10):
+#     global counter, reset_task
+#     await asyncio.sleep(delay)
+#     counter = 0
+#     reset_task = None
 
 
 def get_whisper_service():
@@ -20,16 +31,31 @@ async def websocket_endpoint(
     websocket: WebSocket,
     whisper_service: WhisperService = Depends(get_whisper_service),
 ):
+    # global counter, reset_task
+
     xid_message = {
         "xId": None,
         "service": "",
         "details": "",
     }
+    ip = websocket.client.host if websocket.client is not None else None
     await websocket.accept()
     ACTIVE_CONNECTIONS.append(websocket)
     try:
         while True:
             message = await websocket.receive()
+            # counter += 1
+
+            # Schedule/reset the reset task
+            # if reset_task is None:
+            #     reset_task = asyncio.create_task(reset_counter_after_delay(10))
+
+            allowed = await increment_and_check_limits(ip)
+            if not allowed:
+                # if counter >= 4:
+                await websocket.send_text("Rate limit exceeded. Try again later.")
+                await websocket.close(code=4000, reason="Client not allowed")
+                break
 
             if "bytes" in message:
                 audio_data = message["bytes"]
@@ -44,18 +70,18 @@ async def websocket_endpoint(
                 xid_message["details"] = "get_transcription_with_timestamps(temp_audio)"
                 await broadcast_message(xid_message)
 
-                # await broadcast_message(
-                #     {
-                #         "event": "transcription",
-                #         "transcripts": transcripts_with_timestamps,
-                #     }
-                # )
-                await websocket.send_json(
+                await broadcast_message(
                     {
                         "event": "transcription",
                         "transcripts": transcripts_with_timestamps,
                     }
                 )
+                # await websocket.send_json(
+                #     {
+                #         "event": "transcription",
+                #         "transcripts": transcripts_with_timestamps,
+                #     }
+                # )
             elif "text" in message:
                 text_message = message["text"]
                 xid = get_by_key(text_message, "xId")
@@ -87,7 +113,7 @@ async def broadcast_message(message: dict, delay: float = 1):
             await connection.send_json(message)
             await asyncio.sleep(delay)
         except RuntimeError as e:
-            print(f"Error sending message to {connection}: {e}")
+            logger.error(f"Error sending message to {connection}: {e}")
             disconnected.append(connection)
 
     # Remove disconnected websockets
