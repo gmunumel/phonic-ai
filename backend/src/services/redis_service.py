@@ -6,8 +6,8 @@ from src.log import logger
 
 redis = aioredis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
 
-MAX_RECORDINGS_PER_MINUTE = int(os.getenv("MAX_RECORDINGS_PER_MINUTE", "10"))
-MAX_RECORDINGS_PER_HOUR = int(os.getenv("MAX_RECORDINGS_PER_HOUR", "60"))
+MAX_RECORDINGS_PER_MINUTE = int(os.getenv("MAX_RECORDINGS_PER_MINUTE", "40"))
+MAX_RECORDINGS_PER_HOUR = int(os.getenv("MAX_RECORDINGS_PER_HOUR", "120"))
 MAX_RECORDINGS_PER_DAY = int(os.getenv("MAX_RECORDINGS_PER_DAY", "200"))
 
 
@@ -32,7 +32,7 @@ async def increment_and_check_limits(ip: str | None) -> bool:
         pipe.incr(day_key)
         pipe.expire(day_key, 86400)
         pipe.set(last_key, now)
-        results = await pipe.execute()
+        _results = await pipe.execute()
 
     minute_count = int(await redis.get(minute_key) or 0)
     hour_count = int(await redis.get(hour_key) or 0)

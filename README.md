@@ -35,6 +35,13 @@ Live Audio Transcript application that combines real-time audio streaming with A
   - **whisper_integration.py**: Functions to interact with the Whisper API.
   - **README.md**: Documentation for the AI integration.
 
+## Demo
+
+## Demo
+
+A demonstration of the application is available:  
+[![Watch the demo on YouTube](https://img.youtube.com/vi/GRMIO1wBjo4/0.jpg)](https://youtu.be/GRMIO1wBjo4)
+
 ## Key Features
 
 - Speak into the microphone to see live transcription.
@@ -118,7 +125,7 @@ The following sequence diagram illustrates the flow of audio transcription in th
    The Backend receives the audio data and forwards it to the WhisperService for transcription by calling the `transcribe(audio_data)` method.
 
 4. **Whisper Service to AI Integration:**
-   The WhisperService interacts with the WhisperIntegration (AI) component, requesting transcription with timestamps by invoking `get_transcription_with_timestamps(temp_audio)`.
+   The WhisperService interacts with the WhisperIntegration (AI) component, requesting transcription by invoking `get_transcription(temp_audio)`.
 
 5. **AI Integration Response:**
    The WhisperIntegration (AI) processes the audio and returns the transcription segments, including text and timestamp information, back to the WhisperService.

@@ -1,9 +1,8 @@
 # pylint: disable=import-error
-from fastapi import FastAPI, UploadFile, File, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.websocket import websocket_router
-from src.services.whisper_service import WhisperService
 
 
 app = FastAPI()
@@ -19,21 +18,3 @@ app.add_middleware(
 
 # Include WebSocket routes
 app.include_router(websocket_router)
-
-
-# TODO : remove this endpoint or comment it out
-# This is a temporary endpoint for testing purposes
-def get_whisper_service():
-    return WhisperService()
-
-
-# TODO : remove this endpoint or comment it out
-# This is a temporary endpoint for testing purposes
-@app.post("/transcribe")
-async def transcribe(
-    file: UploadFile = File(...),
-    whisper_service: WhisperService = Depends(get_whisper_service),
-):
-    audio_data = await file.read()
-    result = whisper_service.transcribe(audio_data)
-    return {"transcripts": result}

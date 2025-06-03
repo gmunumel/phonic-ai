@@ -4,7 +4,7 @@ actor User
 User -> Frontend : Start Recording\n(Sends audio stream)
 Frontend -> Backend : WebSocket (audio chunk)
 Backend -> WhisperService : transcribe(audio_data)
-WhisperService -> "WhisperIntegration (AI)" : get_transcription_with_timestamps(temp_audio)
+WhisperService -> "WhisperIntegration (AI)" : get_transcription(temp_audio)
 "WhisperIntegration (AI)" --> WhisperService : [segments: text, start, end]
 WhisperService --> Backend : [segments: text, start, end]
 Backend --> Frontend : WebSocket "transcription" event

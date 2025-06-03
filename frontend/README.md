@@ -20,6 +20,12 @@ To get started with the frontend application, follow these steps:
 
    This will launch the application in your default web browser.
 
+3. **Test the Application**:
+
+   ```
+   npm test
+   ```
+
 ## Environment Variables
 
 Create a `.env` file in the `frontend` directory with the following variables (adjust if necessary):

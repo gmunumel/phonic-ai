@@ -3,8 +3,16 @@ let xIdCallback:
   | ((xId: string | null, service: string, details: string | null) => void)
   | null = null;
 let transcriptionCallback:
-  | ((segments: Array<{ text: string; start: number; end: number }>) => void)
+  | ((
+      transcripts: Array<{
+        id: number;
+        text: string;
+        start: number;
+        end: number;
+      }>
+    ) => void)
   | null = null;
+let connectionStatusCallback: ((connected: boolean) => void) | null = null;
 
 const WAIT_TIME_BEFORE_RECONNECT_MS = Number(
   process.env.WAIT_TIME_BEFORE_RECONNECT_MS || 30000 // 30 seconds
@@ -19,14 +27,16 @@ export const connectWebSocket = () => {
 
   socket.onopen = () => {
     console.log("Connected to WebSocket server");
+    if (connectionStatusCallback) connectionStatusCallback(true);
   };
 
   socket.onclose = (event) => {
-    // Check for your custom close code
+    if (connectionStatusCallback) connectionStatusCallback(false);
+    // Custom close code
     if (event.code === 4000) {
       // Wait before reconnecting
       setTimeout(() => {
-        connectWebSocket(); // or your reconnect logic
+        connectWebSocket();
       }, WAIT_TIME_BEFORE_RECONNECT_MS);
     } else {
       // Handle other close reasons
@@ -38,14 +48,19 @@ export const connectWebSocket = () => {
   };
 
   socket.onmessage = (event) => {
-    if (
-      typeof event.data === "string" &&
-      event.data.includes("Rate limit exceeded")
-    ) {
-      window.dispatchEvent(
-        new CustomEvent("rate-limit-error", { detail: event.data })
-      );
-      return;
+    if (typeof event.data === "string") {
+      if (event.data.includes("Rate limit exceeded")) {
+        window.dispatchEvent(
+          new CustomEvent("rate-limit-error", { detail: event.data })
+        );
+        return;
+      }
+      if (event.data.toLowerCase().includes("error")) {
+        window.dispatchEvent(
+          new CustomEvent("generic-error", { detail: event.data })
+        );
+        return;
+      }
     }
 
     try {
@@ -62,13 +77,13 @@ export const connectWebSocket = () => {
 };
 
 export const sendXId = (xId: string) => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
+  if (isWebSocketConnected()) {
     socket.send(JSON.stringify({ xId }));
   }
 };
 
 export const sendMessage = (message: string) => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
+  if (isWebSocketConnected()) {
     socket.send(JSON.stringify({ message }));
   }
 };
@@ -80,7 +95,7 @@ export const onXIdReceived = (
 };
 
 export const sendAudioChunk = (blob: Blob) => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
+  if (isWebSocketConnected()) {
     blob.arrayBuffer().then((buffer) => {
       socket.send(buffer);
     });
@@ -89,8 +104,17 @@ export const sendAudioChunk = (blob: Blob) => {
 
 export const onTranscriptionReceived = (
   callback: (
-    segments: Array<{ text: string; start: number; end: number }>
+    transcripts: Array<{ id: number; text: string; start: number; end: number }>
   ) => void
 ) => {
   transcriptionCallback = callback;
+};
+
+export const isWebSocketConnected = () =>
+  socket && socket.readyState === WebSocket.OPEN;
+
+export const onConnectionStatusChange = (
+  callback: (connected: boolean) => void
+) => {
+  connectionStatusCallback = callback;
 };

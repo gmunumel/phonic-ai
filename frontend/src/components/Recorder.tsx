@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { startRecord, stopRecord } from "store/recorderSlice";
 import { RecordRTCPromisesHandler } from "recordrtc";
-import { sendXId, sendAudioChunk, sendMessage } from "services/websockets";
+import {
+  sendXId,
+  sendAudioChunk,
+  sendMessage,
+  isWebSocketConnected,
+} from "services/websockets";
 import styles from "components/Recorder.module.css";
 
 const WAIT_TIME_BETWEEN_CHUNK_AUDIO_MS = Number(
@@ -19,6 +24,7 @@ const Recorder: React.FC = () => {
   const dispatch = useDispatch();
 
   const startRecording = async () => {
+    if (!isWebSocketConnected()) return;
     dispatch(startRecord());
     xIdRef.current = Math.random().toString(36).substring(2, 15);
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -28,7 +34,6 @@ const Recorder: React.FC = () => {
     setIsRecording(true);
 
     intervalRef.current = setInterval(async () => {
-      console.log(`[setInterval] isPlaying: ${isPlaying}`);
       if (recorderRef.current) {
         await recorderRef.current.stopRecording();
         const blob = await recorderRef.current.getBlob();
@@ -67,7 +72,6 @@ const Recorder: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(`[useEffect] isPlaying: ${isPlaying}`);
     if (!isPlaying) {
       stopRecording();
     }
@@ -94,7 +98,7 @@ const Recorder: React.FC = () => {
           )}
         </span>
       </button>
-      <span className={styles.recLabel}>REC</span>
+      <span data-testid="rec-label" className={styles.recLabel}>REC</span>
       <br />
       <audio ref={audioRef} controls />
     </div>

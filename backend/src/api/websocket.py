@@ -1,10 +1,12 @@
 # pylint: disable=import-error
 import json
 import asyncio
+import requests
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 
 from src.services.whisper_service import WhisperService
 from src.services.redis_service import increment_and_check_limits
+from src.models.transcript import Transcript
 from src.log import logger
 
 websocket_router = APIRouter()
@@ -13,13 +15,6 @@ ACTIVE_CONNECTIONS: list[WebSocket] = []
 
 # counter = 0
 # reset_task = None  # Add this at the module level
-
-
-# async def reset_counter_after_delay(delay: float = 10):
-#     global counter, reset_task
-#     await asyncio.sleep(delay)
-#     counter = 0
-#     reset_task = None
 
 
 def get_whisper_service():
@@ -46,15 +41,12 @@ async def websocket_endpoint(
             message = await websocket.receive()
             # counter += 1
 
-            # Schedule/reset the reset task
-            # if reset_task is None:
-            #     reset_task = asyncio.create_task(reset_counter_after_delay(10))
-
             allowed = await increment_and_check_limits(ip)
             if not allowed:
-                # if counter >= 4:
-                await websocket.send_text("Rate limit exceeded. Try again later.")
-                await websocket.close(code=4000, reason="Client not allowed")
+                # if counter >= 10:
+                await close_websocket(
+                    websocket, "Rate limit exceeded. Try again later."
+                )
                 break
 
             if "bytes" in message:
@@ -64,24 +56,19 @@ async def websocket_endpoint(
                 xid_message["details"] = "transcribe(audio_data)"
                 await broadcast_message(xid_message)
 
-                transcripts_with_timestamps = whisper_service.transcribe(audio_data)
+                transcripts = whisper_service.transcribe(audio_data)
 
                 xid_message["service"] = "WhisperIntegration (AI)"
-                xid_message["details"] = "get_transcription_with_timestamps(temp_audio)"
+                xid_message["details"] = "get_transcription(temp_audio)"
                 await broadcast_message(xid_message)
 
                 await broadcast_message(
                     {
                         "event": "transcription",
-                        "transcripts": transcripts_with_timestamps,
-                    }
+                        "transcripts": Transcript.to_dict(transcripts),
+                    },
+                    delay=0.0,  # set to 0 in production
                 )
-                # await websocket.send_json(
-                #     {
-                #         "event": "transcription",
-                #         "transcripts": transcripts_with_timestamps,
-                #     }
-                # )
             elif "text" in message:
                 text_message = message["text"]
                 xid = get_by_key(text_message, "xId")
@@ -94,8 +81,17 @@ async def websocket_endpoint(
                     xid_message["service"] = "Stop"
                     xid_message["details"] = None
                 await broadcast_message(xid_message)
+    except requests.exceptions.HTTPError as err:
+        error_message = err.response.text if err.response else "HTTP error occurred"
+        logger.error(f"HTTP error occurred: {error_message}")
+        await close_websocket(websocket, error_message)
     except WebSocketDisconnect:
         ACTIVE_CONNECTIONS.remove(websocket)
+
+
+async def close_websocket(websocket: WebSocket, message: str):
+    await websocket.send_text(message)
+    await websocket.close(code=4000, reason="Client not allowed")
 
 
 def get_by_key(message: str, key: str) -> str | None:

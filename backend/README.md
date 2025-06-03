@@ -43,7 +43,13 @@ This directory contains the backend implementation of the Live Audio Transcript 
 
    The `export` command is to set up a `PYTHONPATH` based on value in `.env` file.
 
-4. **Access the API**:
+4. **Test the Application**:
+
+   ```
+   pytest -v
+   ```
+
+5. **Access the API**:
    The API will be available at `http://localhost:8000`. You can access the WebSocket endpoint at `ws://localhost:8000/ws`.
 
 ## Environment Variables
@@ -54,8 +60,8 @@ Create a `.env` file in the `backend` directory with the following variables (ad
 | --------------------------- | -------------------------------------------- | --------------------------- |
 | `PYTHONPATH`                | Path to the external `ai` package directory. | `/home/<user>/phonic-ai/ai` |
 | `REDIS_URL`                 | Redis server url.                            | `redis://localhost:6379`    |
-| `MAX_RECORDINGS_PER_MINUTE` | Maximum recordings per minute.               | 10                          |
-| `MAX_RECORDINGS_PER_HOUR`   | Maximum recordings per hour.                 | 60                          |
+| `MAX_RECORDINGS_PER_MINUTE` | Maximum recordings per minute.               | 40                          |
+| `MAX_RECORDINGS_PER_HOUR`   | Maximum recordings per hour.                 | 120                         |
 | `MAX_RECORDINGS_PER_DAY`    | Maximum recordings per day.                  | 200                         |
 
 ## Usage Details
