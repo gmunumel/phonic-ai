@@ -28,8 +28,8 @@ const SequenceDiagram: React.FC = () => {
       Frontend->>Backend: WebSocket (audio chunk)
       Backend->>WhisperService: transcribe(audio_data)
       WhisperService->>WhisperIntegration (AI): get_transcription(temp_audio)
-      WhisperIntegration (AI)-->>WhisperService: [segments: text, start, end]
-      WhisperService-->>Backend: [segments: text, start, end]
+      WhisperIntegration (AI)-->>WhisperService: [transcripts: text, start, end]
+      WhisperService-->>Backend: [transcripts: text, start, end]
       Backend-->>Frontend: WebSocket "transcription" event
       Frontend-->>User: Display live transcript
   
