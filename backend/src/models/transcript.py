@@ -15,11 +15,11 @@ class Transcript:
             or "transcripts" not in data
             or not isinstance(data["transcripts"], list)
         ):
-            raise ValueError("Invalid data format for Transcript creation")
+            return []
         transcripts = []
         for transcript in data["transcripts"]:
             if not all(key in transcript for key in ["id", "text", "start", "end"]):
-                raise ValueError("Missing keys in transcript data")
+                return []
             transcripts.append(
                 cls(
                     id=transcript["id"],

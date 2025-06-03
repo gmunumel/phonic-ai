@@ -18,14 +18,12 @@ def test_transcript_from_dict_valid():
 
 def test_transcript_from_dict_invalid_missing_transcripts():
     data = {}
-    with pytest.raises(ValueError):
-        Transcript.from_dict(data)
+    assert Transcript.from_dict(data) == []
 
 
 def test_transcript_from_dict_invalid_missing_keys():
     data = {"transcripts": [{"id": 1, "text": "Hello", "start": 0.0}]}  # missing 'end'
-    with pytest.raises(ValueError):
-        Transcript.from_dict(data)
+    assert Transcript.from_dict(data) == []
 
 
 def test_transcript_to_dict():

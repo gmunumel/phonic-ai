@@ -16,6 +16,8 @@ async def increment_and_check_limits(ip: str | None) -> bool:
         logger.error("No IP address provided, cannot track limits.")
         return False
 
+    redis.sadd("visited_ips", ip)
+
     now = int(time.time())
     minute_key = f"recordings:{ip}:minute"
     hour_key = f"recordings:{ip}:hour"

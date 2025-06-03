@@ -14,7 +14,6 @@ websocket_router = APIRouter()
 ACTIVE_CONNECTIONS: list[WebSocket] = []
 
 # counter = 0
-# reset_task = None  # Add this at the module level
 
 
 def get_whisper_service():
@@ -26,7 +25,7 @@ async def websocket_endpoint(
     websocket: WebSocket,
     whisper_service: WhisperService = Depends(get_whisper_service),
 ):
-    # global counter, reset_task
+    # global counter
 
     xid_message = {
         "xId": None,
