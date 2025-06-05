@@ -46,7 +46,7 @@ This directory contains the backend implementation of the Live Audio Transcript 
 4. **Test the Application**:
 
    ```
-   pytest -v
+   PYTHONPATH=../ai pytest -v
    ```
 
 5. **Access the API**:

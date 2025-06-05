@@ -1,13 +1,18 @@
 # pylint: disable=import-error
+import os
 import json
 import asyncio
 import requests
+
+from dotenv import load_dotenv
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 
 from src.services.whisper_service import WhisperService
 from src.services.redis_service import increment_and_check_limits
 from src.models.transcript import Transcript
 from src.log import logger
+
+load_dotenv()
 
 websocket_router = APIRouter()
 
@@ -20,7 +25,7 @@ def get_whisper_service():
     return WhisperService()
 
 
-@websocket_router.websocket("/ws/transcribe")
+@websocket_router.websocket((os.getenv("APP_PREFIX") or "") + "/ws/transcribe")
 async def websocket_endpoint(
     websocket: WebSocket,
     whisper_service: WhisperService = Depends(get_whisper_service),
@@ -82,7 +87,12 @@ async def websocket_endpoint(
                 await broadcast_message(xid_message)
     except requests.exceptions.HTTPError as err:
         error_message = err.response.text if err.response else "HTTP error occurred"
-        logger.error(f"HTTP error occurred: {error_message}")
+        if err.response:
+            logger.error(f"Status Code: {err.response.status_code}")
+            logger.error(f"Headers: {err.response.headers}")
+            logger.error(f"Body: {err.response.text}")
+        else:
+            logger.error("No response received.")
         await close_websocket(websocket, error_message)
     except WebSocketDisconnect:
         ACTIVE_CONNECTIONS.remove(websocket)

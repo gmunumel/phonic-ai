@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: {{ .Values.backend.image }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: REDIS_URL
+              value: "redis://redis:6379"
+            - name: PYTHONPATH
+              value: "/phonic-ai/ai"
+            - name: APP_PREFIX
+              value: "/portfolio/phonic-ai"
+            - name: MAX_RECORDINGS_PER_MINUTE
+              value: "10"
+            - name: MAX_RECORDINGS_PER_HOUR
+              value: "60"
+            - name: MAX_RECORDINGS_PER_DAY
+              value: "200"

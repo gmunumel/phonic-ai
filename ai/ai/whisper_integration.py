@@ -2,6 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 
+# from .log import logger
 
 load_dotenv()
 
@@ -19,8 +20,8 @@ class WhisperIntegration:
     def transcribe_audio(
         self, audio_file_path: str, model: str = "whisper-1", language: str = "en"
     ) -> dict:
-        # print(f"api_key: {self.api_key}")
-        # print(f"api_url: {self.api_url}")
+        # logger.info("api_key: %s", self.api_key)
+        # logger.info("api_url: %s", self.api_url)
         with open(audio_file_path, "rb") as audio_file:
             headers = {"Authorization": f"Bearer {self.api_key}"}
             files = {

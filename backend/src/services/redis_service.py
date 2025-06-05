@@ -2,8 +2,11 @@ import time
 import os
 import redis.asyncio as aioredis
 
+from dotenv import load_dotenv
+
 from src.log import logger
 
+load_dotenv()
 redis = aioredis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
 
 MAX_RECORDINGS_PER_MINUTE = int(os.getenv("MAX_RECORDINGS_PER_MINUTE", "40"))
@@ -16,7 +19,7 @@ async def increment_and_check_limits(ip: str | None) -> bool:
         logger.error("No IP address provided, cannot track limits.")
         return False
 
-    redis.sadd("visited_ips", ip)
+    await redis.sadd("visited_ips", ip)  # type: ignore
 
     now = int(time.time())
     minute_key = f"recordings:{ip}:minute"
@@ -27,13 +30,13 @@ async def increment_and_check_limits(ip: str | None) -> bool:
     # Redis pipeline for atomicity and performance
     async with redis.pipeline() as pipe:
         # Increment counters and set expiry if new
-        pipe.incr(minute_key)
-        pipe.expire(minute_key, 60)
-        pipe.incr(hour_key)
-        pipe.expire(hour_key, 3600)
-        pipe.incr(day_key)
-        pipe.expire(day_key, 86400)
-        pipe.set(last_key, now)
+        await pipe.incr(minute_key)
+        await pipe.expire(minute_key, 60)
+        await pipe.incr(hour_key)
+        await pipe.expire(hour_key, 3600)
+        await pipe.incr(day_key)
+        await pipe.expire(day_key, 86400)
+        await pipe.set(last_key, now)
         _results = await pipe.execute()
 
     minute_count = int(await redis.get(minute_key) or 0)

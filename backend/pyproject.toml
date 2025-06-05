@@ -13,7 +13,8 @@ dependencies = [
     "python-multipart==0.0.9",
     "pytest==8.4.0",
     "pytest-asyncio==1.0.0",
-    "types-requests==2.32.0.20250602"
+    "types-requests==2.32.0.20250602",
+    "python-dotenv==1.1.0"
 ]
 
 [build-system]

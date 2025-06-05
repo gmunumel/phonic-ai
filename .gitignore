@@ -19,7 +19,7 @@ backend/**/*/__pycache__/
 backend/.pytest_cache
 backend/.coverage
 backend/.coverage.*
-backend/*.env
+backend/*.env*
 backend/.venv
 backend/.vscode
 backend/**/*/*.egg-info
@@ -34,7 +34,7 @@ frontend/.pnp.js
 frontend/coverage
 frontend/build
 frontend/.DS_Store
-frontend/*.env
+frontend/*.env*
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*

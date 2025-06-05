@@ -1,0 +1,4 @@
+apiVersion: v2
+name: phonic-ai
+description: Phonic AI Helm Chart
+version: 0.1.0
