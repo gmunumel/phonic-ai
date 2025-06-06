@@ -39,8 +39,8 @@ Live Audio Transcript application that combines real-time audio streaming with A
 
 You can try on: [here](https://stackedge.dev/portfolio/phonic-ai/)
 
-A demonstration of the application is available:  
-[![Watch the demo on YouTube](https://img.youtube.com/vi/GRMIO1wBjo4/0.jpg)](https://youtu.be/GRMIO1wBjo4)
+A demonstration of the application:  
+![Phonic AI - Demo](docs/phonic-ai-demo.gif)
 
 ## Key Features
 
