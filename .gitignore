@@ -1,4 +1,5 @@
 .python-version
+.mypy_cache
 
 #ai
 ai/.mypy_cache
