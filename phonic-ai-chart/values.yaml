@@ -13,4 +13,4 @@ redis:
 ingress:
   enabled: true
   certificateArn: arn:aws:acm:eu-central-1:177539010329:certificate/ecb39198-2d7a-488c-bf43-8ba1d664c3a0
-  host: stackedge.dev
+  host: phonic-ai.stackedge.dev
