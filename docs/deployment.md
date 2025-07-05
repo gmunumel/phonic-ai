@@ -1,5 +1,7 @@
 # Deployment steps
 
+## Using AWS Infrastructure
+
 1. Create an EKS Cluster
 
    ```
@@ -114,7 +116,34 @@
    kubectl get ingress
    ```
 
-## Thoubleshooting
+## Using My Own Server with Kubernetes (k3s)
+
+### Push Images to Docker Hub
+
+
+For the frontend
+```
+docker build -t phonic-ai-frontend -f frontend/Dockerfile .
+docker tag phonic-ai-frontend:latest gabrielmunumel/phonic-ai-frontend:latest
+docker push gabrielmunumel/phonic-ai-frontend:latest
+```
+
+For the backend
+```
+docker build -t phonic-ai-backend -f backend/Dockerfile .
+docker tag phonic-ai-backend:latest gabrielmunumel/phonic-ai-backend:latest
+docker push gabrielmunumel/phonic-ai-backend:latest
+```
+
+### Deploy with Helm
+
+```
+helm install phonic-ai ./phonic-ai-chart
+# or upgrade
+helm upgrade --install phonic-ai ./phonic-ai-chart
+```
+
+## Troubleshooting
 
 ### ADDRESS is not defined
 
@@ -218,7 +247,7 @@ kubectl rollout restart deployment backend
 
 ### Configure nginx in deployed Frontend
 
-First connec to deployed frontend
+First connect to deployed frontend
 
 ```
 kubectl exec -it frontend-6c954dd45d-xxmxd -- /bin/sh
